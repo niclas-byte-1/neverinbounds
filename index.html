@@ -7,6 +7,9 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="NeverInBounds">
 <meta name="theme-color" content="#006B54">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <link rel="apple-touch-icon" href="/icon-192.png">
 <link rel="manifest" href="/manifest.json">
 <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
@@ -131,7 +134,7 @@ return{...p,brutto:br,netto:ne,weighted:w,turniere:ps.length,hcp:lh,hcpStart:fh}
 if(loading)return e("div",{className:"loading"},e("div",null,e("div",{className:"title"},"NeverInBounds"),e("div",{style:{fontSize:12,color:"rgba(255,215,0,.6)",letterSpacing:3,marginTop:8}},"LOADING...")));
 
 return e("div",{id:"app"},
-e("div",{className:"header"},e("div",{className:"title"},"NeverInBounds"),e("div",{className:"divider"}),e("div",{className:"subtitle"},"A Tradition Unlike Any Other")),
+e("div",{className:"header"},e("div",{className:"title"},"NeverInBounds"),e("div",{className:"divider"}),e("div",{className:"subtitle"},"A Tradition Unlike Any Other"),e("div",{style:{fontSize:9,color:"rgba(255,255,255,.35)",marginTop:6,letterSpacing:1}},"Version 19.11.2026 \u00b7 v4")),
 !view&&e("div",{className:"tabs"},
 [["board","Board"],["turniere","Turniere"],["stats","Stats"],["hof","Hall of Fame"],["neu","+ Score"]].map(([k,l])=>e("div",{key:k,className:"tab"+(tab===k?" active":""),onClick:()=>setTab(k)},l))),
 view&&e("div",{className:"back",onClick:()=>setV(null)},"\u2190 Zur\u00fcck"),

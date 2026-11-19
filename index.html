@@ -94,6 +94,7 @@ const[holes,setH]=S([]);
 const[courses,setC]=S([]);
 const[loading,setL]=S(true);
 const[view,setV]=S(null);
+const[selYear,setSelYear]=S(new Date().getFullYear());
 
 const load=CB(async()=>{
 setL(true);
@@ -106,8 +107,18 @@ setL(false);
 
 E(()=>{load()},[load]);
 
+const nowY=new Date().getFullYear();
+const yearSet=new Set([nowY]);
+tournaments.forEach(t=>{const y=new Date(t.date).getFullYear();if(y>=2026)yearSet.add(y)});
+const years=[...yearSet].sort((a,b)=>b-a);
+const curIds=tournaments.filter(t=>new Date(t.date).getFullYear()===selYear).map(t=>t.id);
+const scoresY=scores.filter(s=>curIds.includes(s.tournament_id));
+const holesY=holes.filter(h=>curIds.includes(h.tournament_id));
+const yearBar=years.length>1?e("div",{style:{display:"flex",gap:8,padding:"12px 16px 0",alignItems:"center"}},
+e("span",{style:{fontSize:10,color:"rgba(255,215,0,.6)",letterSpacing:2,textTransform:"uppercase"}},"Saison"),
+years.map(y=>e("div",{key:y,className:"pill"+(selYear===y?" on":""),style:{padding:"6px 14px",fontSize:12},onClick:()=>setSelYear(y)},String(y)))):null;
 const lb=players.map(p=>{
-const ps=scores.filter(s=>s.player_id===p.id);
+const ps=scoresY.filter(s=>s.player_id===p.id);
 const br=ps.reduce((a,s)=>a+(s.brutto_points||0),0);
 const ne=ps.reduce((a,s)=>a+(s.netto_points||0),0);
 const w=br+ne;
@@ -125,9 +136,10 @@ e("div",{className:"header"},e("div",{className:"title"},"NeverInBounds"),e("div
 [["board","Board"],["turniere","Turniere"],["stats","Stats"],["hof","Hall of Fame"],["neu","+ Score"]].map(([k,l])=>e("div",{key:k,className:"tab"+(tab===k?" active":""),onClick:()=>setTab(k)},l))),
 view&&e("div",{className:"back",onClick:()=>setV(null)},"\u2190 Zur\u00fcck"),
 e("div",{style:{paddingBottom:20}},
-!view&&tab==="board"&&e(Leaderboard,{data:lb,onPlayer:p=>setV({t:"p",p}),scores,tournaments}),
+!view&&(tab==="board"||tab==="stats")&&yearBar,
+!view&&tab==="board"&&e(Leaderboard,{data:lb,onPlayer:p=>setV({t:"p",p}),scores,tournaments,year:selYear}),
 !view&&tab==="turniere"&&e(Turniere,{tournaments,scores,players,courses,onT:t=>setV({t:"t",tr:t})}),
-!view&&tab==="stats"&&e(Stats,{lb,holes,players,scores,tournaments}),
+!view&&tab==="stats"&&e(Stats,{lb,holes:holesY,players,scores:scoresY,tournaments}),
 !view&&tab==="hof"&&e(HallOfFame,{scores,players,tournaments}),
 !view&&tab==="neu"&&e(NewScore,{players,courses,onSaved:()=>{load();setTab("board")}}),
 view&&view.t==="p"&&e(PlayerDetail,{player:view.p,scores,tournaments,holes,courses}),
@@ -135,7 +147,7 @@ view&&view.t==="t"&&e(TournamentDetail,{tournament:view.tr,scores,players,holes,
 ));
 }
 
-function Leaderboard({data,onPlayer,scores,tournaments}){
+function Leaderboard({data,onPlayer,scores,tournaments,year}){
 const[sort,setSort]=S({by:"weighted",dir:"desc"});
 function toggle(k){setSort(s=>s.by===k?{by:k,dir:s.dir==="desc"?"asc":"desc"}:{by:k,dir:"desc"})}
 const sorted=[...data].sort((a,b)=>{
@@ -146,7 +158,7 @@ function arrow(k){return sort.by!==k?" \u25B4\u25BE":(sort.dir==="desc"?" \u25BE
 const hdStyle={cursor:"pointer",userSelect:"none"};
 const activeStyle={color:"#FFD700"};
 
-const curYear=new Date().getFullYear();
+const curYear=year;
 const hcpChanges=data.map(p=>{
 const ps=scores.filter(s=>s.player_id===p.id);
 const yearTourneys=tournaments.filter(t=>new Date(t.date).getFullYear()===curYear).map(t=>t.id);
